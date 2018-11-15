@@ -1,4 +1,15 @@
 
+Forth chips!
+
+The goal is to gather a permanent reference of all documentation
+about forth chips and related stack machines.
+
+**Please contribute!**
+
+Documents for each chip are organized in sub directories by company name.
+
+List of forth chips by company:
+
 # Computer Cowboys
  - ShBoom
 
@@ -36,6 +47,15 @@
 
 # UltraTechnology
   - F21
+
+# Intellasys
+ - Seaforth 24
+ - Seaforth 40
+
+# Greenarrays
+ - GA4
+ - GA32
+ - GA144
 
 # other
  - Charles Moore - P8, V21, P32, p32
