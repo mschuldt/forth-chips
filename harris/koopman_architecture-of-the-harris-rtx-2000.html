@@ -1,0 +1,349 @@
+<!DOCTYPE HTML PUBLIC "-//SoftQuad//DTD draft HTML 3.2 + extensions for HoTMetaL PRO 3.0 19960923//EN"
+>
+<HTML>
+<HEAD>
+<TITLE>Stack Computers: 4.5 ARCHITECTURE OF THE HARRIS RTX 2000
+</TITLE>
+<LINK REV="made" HREF="mailto:koopman@cmu.edu"></HEAD>
+<BODY>
+<P><A HREF="index.html"><B>Stack Computers</B></A>: the new wave
+<IMG SRC="horiz_sp.gif"> &copy; Copyright 1989, 
+<I><A HREF="http://www.cs.cmu.edu/~koopman/index.html">Philip Koopman,</A></I>
+<A HREF="copyrght.html">All Rights Reserved.</A> 
+</P>
+<P><A HREF="chap4.html">Chapter 4.</A> Architecture of 16-bit Systems 
+</P>
+<P></P>
+<HR>
+<P>
+</P>
+<H2>4.5 ARCHITECTURE OF THE HARRIS RTX 2000</H2>
+<P></P>
+<P></P>
+<HR>
+<P></P>
+<H3><A NAME="451">4.5.1</A> Introduction</H3>
+<P>The Harris Semiconductor RTX 2000 is a 16-bit stack processor that  is a
+descendent of the Novix NC4016.  The RTX 2000 has a very high  level of
+integration.  It includes not only the core processor,  but also stack memories,
+a hardware multiplier, and counter/timers  on a single chip.    
+</P>
+<P></P>
+<P></P>
+<HR>
+<P></P>
+<H3><A NAME="452">4.5.2</A> Block diagram</H3>
+<P><IMG SRC="fig4_8.gif" ALT="[Figure 4.8]"><BR>
+<B>Figure 4.8 -- RTX 2000 block diagram.</B> 
+</P>
+<P>Figure 4.8 shows the block diagram of the RTX 2000.  The major difference 
+between the RTX 2000 and the NC4016 are the on-chip resources in addition  to
+the CPU core.  These resources include: a 256 element return  stack, 256 element
+data stack, 16 x 16 bit single cycle hardware multiplier,  three counter/timers,
+and a prioritized vectored interrupt controller.  Apart  from the on-chip
+stacks, all the RTX 2000's extra features are  accessed via the I/O bus (called
+the G bus in the NC4016 and the ASIC  Bus in the RTX 2000). 
+</P>
+<P>Other enhancements to the original Novix design available in the  RTX 2000
+include: a byte swapping capability for manipulation of 8-bit  data, the ability
+to jump between adjacent memory blocks when  performing conditional branches,
+and interrupt on stack overflow/underflow. 
+</P>
+<P>Another feature of the RTX 2000 is the on-chip memory page controller 
+logic.  This allows extending the 32K word program memory limit  by specifying
+separate page registers for the code segment, the data  segment (for fetches and
+stores), the user memory base address and  page registers (for relocating the
+user variable area), and the index  page register (for extending the value of
+the Return Stack address).  Since  the Return Stack holds a full 21 bits,
+subroutine calls can be made  anywhere in memory with a special far call
+instruction sequence that  saves the full return address in a single Return
+Stack location.    
+</P>
+<P></P>
+<P></P>
+<HR>
+<P></P>
+<H3><A NAME="453">4.5.3</A> Instruction set summary</H3>
+<P>The instructions of the RTX 2000 are quite similar in function to  those of
+the NC4016, but are sufficiently different in format to merit  a separate
+description.  Figure 4.9 shows the instruction formats  for the RTX 2000.
+</P>
+<P><IMG SRC="fig4_9a.gif" ALT="[Figure 4.9a]"><BR>
+<B>Figure 4.9(a) -- RTX instruction formats -- subroutine call.</B> 
+</P>
+<P>Figure 4.9a shows the instruction format for subroutine calls.  In  this
+format, the highest bit of the instruction is set to 0, and the  remainder of
+the instruction is used to hold a 15-bit subroutine address.  This  limits
+programs to 32K words of memory. 
+</P>
+<P><IMG SRC="fig4_9b.gif" ALT="[Figure 4.9b]"><BR>
+<B>Figure 4.9(b) -- RTX instruction formats -- conditional branch.</B>
+</P>
+<P>Figure 4.9b shows the conditional branch instruction format.  Bits  11 and
+12 select either a branch if T is zero (with either a conditional  or
+unconditional popping of the data stack), an unconditional branch,  or a
+decrement and branch-if-zero using the index register for implementing  loops. 
+Bits 0-8 specify the lowest 9 bits of the target address,  while bits 9 and 10
+control an incrementer/decrementer for the upper  6 bits of the branch address
+to allow branching within the same 512  byte memory page, to adjacent pages, or
+to page 0. 
+</P>
+<P><IMG SRC="fig4_9c.gif" ALT="[Figure 4.9c]"><BR>
+<B>Figure 4.9(c) -- RTX instruction formats -- ALU operation.</B>
+</P>
+<P>Figure 4.9c shows the format of the ALU instruction.  Bits 0-3  control the
+operation of the shifter that shifts the output of the  ALU. 
+</P>
+<P>Bit 5 of the ALU instruction indicates a subroutine return operation.  This 
+allows subroutine returns to be combined with preceding arithmetic  operations
+to obtain &quot;free&quot; subroutine returns in many cases. 
+</P>
+<P>Bits 8-11 select an ALU function, with bit 7 controlling whether  the output
+of the ALU is inverted. 
+</P>
+<P><IMG SRC="fig4_9d.gif" ALT="[Figure 4.9d]"><BR>
+<B>Figure 4.9(d) -- RTX instruction formats -- ALU operation (multistep mode).</B>
+</P>
+<P>Figure 4.9d shows the format of the ALU instruction in multi-step  mode. 
+This format is quite similar to the ALU instruction format.  Bits  0-3 select a
+shift control function, bit 5 controls the subroutine  return function, and bits
+9-11 selects the ALU operation. 
+</P>
+<P>In multi-step mode, bit 8 selects either the Multiply/Divide register  or
+the Square Root register for special operations, while bits 6-7  select special
+multi-step control functions.  A primary use of the  multi-step mode is for
+repeated multiplication and division step operations. 
+</P>
+<P><IMG SRC="fig4_9e.gif" ALT="[Figure 4.9e]"><BR>
+<B>Figure 4.9(e) -- RTX instruction formats -- memory reference.</B>
+</P>
+<P>Figure 4.9e shows the format of a memory reference instruction.  These 
+instructions take two clock cycles: one for the instruction fetch,  and one
+clock cycle for the actual reading or writing of the operand.  The  address for
+the memory access is always taken from the T register.  Bit  12 selects either a
+byte or word memory access.  Since the RTX 2000  uses word memory addresses,
+this bit selects a &quot;low half/high  half&quot; or &quot;full word&quot;
+operation at the selected memory  word. 
+</P>
+<P>Bits 6 and 7 indicate whether the operation is a memory read or write  as
+well as other control information.  Bits 0-4 specify a small  constant that can
+be added or subtracted to the T value to perform  and autoincrement or
+autodecrement addressing function.  Bits 8-11  of this instruction specify the
+same ALU functions as the ALU instruction  format. 
+</P>
+<P><IMG SRC="fig4_9f.gif" ALT="[Figure 4.9f]"><BR>
+<B>Figure 4.9(f) -- RTX instruction formats -- miscellaneous instructions.</B>
+</P>
+<P>Figure 4.9f shows the miscellaneous instruction format.  This instruction 
+can be used to read or write a word in the 32 word relocatable user  space,
+saving the time taken to push a memory address on the stack  before performing
+the fetch or store.  It can also be used to transfer  registers within the chip,
+or push either a 5 bit literal (in a single  clock cycle) or a 16 bit literal
+(in two clock cycles) onto the stack.  Bits  8-11 of this instruction specify
+the same ALU functions as the ALU  instruction format. 
+</P>
+<P>The RTX 2000 is specifically designed to execute the Forth language. 
+Because  of the unencoded format of many of the instructions, machine operations
+ that correspond to a sequence of Forth operations can be encoded in  a single
+instruction.  Table 4.3 shows the Forth primitives and  instruction sequences
+that can be executed by the RTX 2000. 
+</P>
+<P>
+</P>
+<PRE>:  (subroutine call)     AND                           
+;  (subroutine exit)     BRANCH
+!                        DROP
++                        DUP
+-                        I
+0                        LIT
+0&lt;                       NOP
+0BRANCH                  OR
+1+                       OVER
+1-                       R&gt;
+2*                       R@
+&gt;R                       SWAP
+@                        XOR
+</PRE>
+<P><B>Table 4.3(a) RTX 2000 Instruction Set Summary -- Forth Primitives.</B>
+(see Appendix B) 
+</P>
+<P></P>
+<PRE>
+inv shift                DUP @ SWAP                    
+lit inv                  DUP nn G! inv
+lit SWAP inv             DUP U! inv
+lit SWAP op              DUP U@ op
+nn inv (short literal)   nn G! inv
+nn OVER op               nn G@ inv
+nn SWAP op               nn G@ DROP inv
+op shift                 nn G@ OVER op
+! inv                    nn G@ SWAP op
+! nn                     OVER inv shift
+@ inv                    OVER SWAP op shift
+@ nn                     OVER SWAP ! inv
+@ SWAP inv               OVER SWAP ! nn
+@ SWAP op                OVER SWAP @ op
+?DUP ?BRANCH             SWAP inv shift
+DDUP inv shift           SWAP DROP inv shift
+DDUP nn SWAP op          SWAP DROP @ nn
+DDUP !                   SWAP DROP DUP inv shift
+DROP inv shift           SWAP DROP DUP @ nn ROT op
+DROP lit inv             SWAP DROP DUP @ SWAP
+DROP nn inv              SWAP OVER op shift
+DROP DUP inv shift       SWAP OVER !
+DUP inv shift            U! inv
+DUP lit op               U@ op
+DUP @ nn ROT op          U@ SWAP inv
+
+Notation:      inv - 1's complement or no-op
+               lit - long literal value
+               nn - short literal value
+               op - ALU operation
+               shift - shift select or no-op
+</PRE>
+<P><B>Table 4.3(b) RTX 2000 Instruction Set Summary -- Compound Forth
+Primitives.</B> 
+</P>
+<P></P>
+<PRE><B>INSTRUCTION      DATA STACK   RETURN STACK</B>
+nn G@                 -&gt; N         -&gt;
+   Fetch the value from internal register or ASIC bus device
+     nn (stored as a 5 bit literal in the instruction).
+
+nn G!               N -&gt;           -&gt;
+   Store N into the internal register or ASIC bus device nn
+     (stored as a 5 bit literal in the instruction)
+
+*               N1 N2 -&gt; D3        -&gt;
+   Single clock cycle hardware multiply
+
+*'                 D1 -&gt; D2        -&gt;
+   Unsigned Multiply step (takes two 16 bit numbers and
+     produces a 32 bit product).
+
+*-                 D1 -&gt; D2        -&gt;
+   Signed Multiply step (takes two 16 bit numbers and produces
+     a 32 bit product).
+
+*F                 D1 -&gt; D2        -&gt;
+   Fractional Multiply step (takes two 16 bit fractions and
+     produces a 32 bit product).
+
+*/'                D1 -&gt; D2        -&gt;
+   Divide step (takes a 16 bit dividend and divisor and
+     produces 16 bit remainder and quotients).
+
+*/''               D1 -&gt; D2        -&gt;
+   Last Divide step (to perform non-restoring division fixup
+     step).
+
+2/                 N1 -&gt; N2        -&gt;
+   Arithmetic shift right (same as division by two for
+   non-negative integers.
+
+D2/                D1 -&gt; D2        -&gt;
+   32 bit arithmetic shift right (same as division by two for
+   non-negative integers.
+
+S'                 D1 -&gt; D2        -&gt;
+   Square Root step.
+
+NEXT                  -&gt;        N1 -&gt; N2
+   Count-down loop using top of return stack as a counter.
+</PRE>
+<P><B>Table 4.3(c) RTX 2000 Instruction Set Summary -- Special Purpose Words.</B>
+
+</P>
+<P></P>
+<P></P>
+<HR>
+<P></P>
+<H3><A NAME="454">4.5.4</A> Architectural features</H3>
+<P>Like the NC4016, the internal structure of the RTX 2000 is optimized  to
+provide single clock cycle instruction execution.  All primitive  operations
+except memory fetch, memory store, and long literal execute  in a single clock
+cycle. 
+</P>
+<P>The RTX 2000 also allows some sequences of Forth instructions to  be
+combined into a single instruction.  A key capability is provided  by the return
+bit in some formats that allows combining subroutine  returns with ALU
+operations.    
+</P>
+<P></P>
+<P></P>
+<HR>
+<P></P>
+<H3><A NAME="455">4.5.5</A> Implementation and featured application areas</H3>
+<P>The RTX 2000 is implemented on 2.0 micron CMOS standard cell technology, 
+packaged in an 84 pin Pin Grid Array (PGA).  The RTX 2000 runs at  up to 10 MHz.
+ A large advantage of standard cell technology is  that RAM and logic may be
+mixed on the same chip, allowing both the  return stacks and data stacks to be
+placed on-chip. 
+</P>
+<P>Because the RTX 2000 executes most instructions, including conditional 
+branches and subroutine calls, in a single cycle, there is a significant  amount
+of time between the beginning of the clock cycle and the time  that the memory
+address is valid for fetching the next instruction.  This  time is approximately
+half the clock cycle, meaning that program memory  must be approximately twice
+as fast as the clock rate. 
+</P>
+<P>While the RTX 2000 was originally based on the NC4016 design, it  has been
+substantially improved and does not have the hardware anomalies  found on the
+NC4016. 
+</P>
+<P>The RTX 2000 is aimed at the high end 16 bit microcontroller market. 
+Because  it is implemented with semicustom technology, specialized versions  of
+the processor can be made for specific design applications.  Some  possible
+applications include laser printer control, Graphics CRT  display control,
+telecommunications control, optical character recognition,  signal processing,
+and military control applications. 
+</P>
+<P>The information in this section is derived from the RTX 2000 Data  Sheet
+(Harris 1988a) and the RTX 2000 Instruction Set Manual (Harris  1988b).    
+</P>
+<P></P>
+<P></P>
+<HR>
+<P></P>
+<H3><A NAME="456">4.5.6</A> Standard cell designs</H3>
+<P>The Harris RTX 2000 derives many of its benefits from the fact that  it is
+built using standard cell technology instead of a gate array.  The  difference
+is that in a gate array, the designer is customizing a  regular pattern of
+preplaced logic gates on the silicon.  In standard  cell design, the designer is
+working with a library of logic functions  that can be arbitrarily arranged on
+the silicon, as no predetermined  gate arrangement scheme is used.  While gate
+arrays with predefined  memory areas are coming into use, the flexibility
+afforded by standard  cell design techniques is not be equalled by a gate array
+approach. 
+</P>
+<P>Thus, the major differences between the NC4016 and the RTX 2000 become 
+apparent: the RTX 2000 is able to take advantage of the flexibility  of standard
+cells to include stack RAM cells on-chip.  Because of  this flexibility, a
+family of RTX 2000 processors with differing capabilities  is planned using the
+same core processor as a large standard cell  in the design process. 
+</P>
+<P>In addition to standard product versions of the RTX family, users  that can
+benefit from application specific hardware.  Examples of  special-purpose
+hardware include serial communication ports, FFT address  generators, data
+compression circuitry, or any other hardware that  might otherwise have to be
+built off-chip.  With standard cell technology,  users can have tailored
+versions of the chip made for their own use.  This  tailoring can include, as
+the process technology gets denser than  2.0 microns, a significant amount of
+program RAM and ROM on-chip.  
+</P>
+<P></P>
+<HR>
+<P>
+<!-- standard trailer -->
+<A HREF="contents.html"><IMG SRC="contents.gif" ALT="CONTENTS"></A>
+<A HREF="index.html"><IMG SRC="top.gif" ALT="TOP"></A>
+<A HREF="chap4.html"><IMG SRC="chapter.gif" ALT="CHAPTER"></A>
+<IMG SRC="horiz_sp.gif">
+<A HREF="sec4_4.html"><IMG SRC="prev.gif" ALT="PREV"></A>
+<IMG SRC="horiz_sp.gif">
+<A HREF="chap5.html"><IMG SRC="next.gif" ALT="NEXT"> NEXT SECTION</A> 
+</P>
+<P><A HREF="http://www.cs.cmu.edu/~koopman/index.html"><IMG
+SRC="home.gif" ALT="HOME"></A> Phil Koopman --  
+<A HREF="mailto:koopman@cmu.edu">koopman@cmu.edu</A>
+</P></BODY></HTML>
